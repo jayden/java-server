@@ -3,8 +3,8 @@ package com.jayden.server;
 import java.io.PrintStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
+
 
 public class ResponseBuilder {
 
@@ -12,27 +12,36 @@ public class ResponseBuilder {
     private static final String CRLF = "\r\n";
     private static final String httpVersion = "HTTP/1.1";
     private int status = 200;
-    private PrintStream writer;
     private String content = "";
     private static final HashMap<Integer, String> statusCodes = new HashMap<Integer, String>();
     private HashMap<String, String> headers = new HashMap<String, String>();
+    private HashMap<String, String> request;
+    private HashMap<String, Response> routes;
+
     static
     {
         statusCodes.put(200, "OK");
         statusCodes.put(404, "Not Found");
     }
 
-    public ResponseBuilder(PrintStream writer)
+    public ResponseBuilder(HashMap<String, String> request, HashMap<String, Response> routes)
     {
-        this.writer = writer;
+        this.request = request;
+        this.routes = routes;
     }
 
-    public void writeResponse()
+    public byte[] getResponse()
     {
-        String response = statusLine() + getHeader() + CRLF + getContent();
-        writer.print(response);
-    }
+        if (routes.containsKey(request.get("URI")))
+            setContent(routes.get(request.get("URI")).getResponse());
+        else
+        {
+            setContent("");
+            setStatus(404);
+        }
 
+        return (statusLine() + getHeader() + CRLF + getContent()).getBytes();
+    }
 
     public void setStatus(int status)
     {
@@ -91,12 +100,4 @@ public class ResponseBuilder {
         setHeader("Content-Length", Integer.toString(0));
         setHeader("Server", "Jayden");
     }
-
-    public String currentDate()
-    {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        Date date = new Date();
-        return dateFormat.format(date);
-    }
-
 }

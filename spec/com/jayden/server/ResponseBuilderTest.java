@@ -1,26 +1,38 @@
 package com.jayden.server;
 
 import junit.framework.*;
-
 import java.io.*;
+import java.util.*;
 
 public class ResponseBuilderTest extends TestCase
 {
     private ByteArrayOutputStream output = null;
     private ResponseBuilder responseBuilder;
     private final String CRLF = "\r\n";
+    private final String BAD_RESPONSE = "HTTP/1.1 404 Not Found\r\n";
     private final String FAKE_RESPONSE = "HTTP/1.1 200 OK\r\n";
     private final String DEFAULT_HEADER = "Content-Length: 0\r\nContent-Type: text/html;charset=utf-8\r\nServer: Jayden";
 
-    private PrintStream mockWriter()
+    private static final HashMap<String, String> requestMap;
+    static
     {
-        output = new ByteArrayOutputStream();
-        return new PrintStream(output);
+        requestMap = new HashMap<String, String>();
+        requestMap.put("Method", "GET");
+        requestMap.put("URI", "/");
+        requestMap.put("Protocol", "HTTP/1.1");
+    }
+
+    private static final HashMap<String, Response> routeMap;
+    static
+    {
+         routeMap = new HashMap<String, Response>();
+        routeMap.put("/echo", new TimeResponse());
+        routeMap.put("/", new FileDirectoryResponse());
     }
 
     public void setUp() throws IOException
     {
-        responseBuilder = new ResponseBuilder(mockWriter());
+        responseBuilder = new ResponseBuilder(requestMap, routeMap);
     }
 
     public void testGetServerResponse() throws Exception
@@ -60,20 +72,33 @@ public class ResponseBuilderTest extends TestCase
     }
 
 
-    public void testWriteDefaultHeader()
+    public void testWriteDefaultHeader() throws IOException
     {
         responseBuilder.setDefaultHeader();
-        responseBuilder.writeResponse();
+        mockWriter().write(responseBuilder.getResponse());
         assertTrue(output.toString().contains(DEFAULT_HEADER));
     }
 
-    public void testWriteResponse()
+    public void testFileDirectoryResponse() throws IOException
     {
-        responseBuilder.setContent("watbro");
-        responseBuilder.setStatus(200);
-        String expectedResponse = FAKE_RESPONSE + DEFAULT_HEADER + CRLF + CRLF + "watbro";
-        responseBuilder.writeResponse();
-        assertEquals(expectedResponse, output.toString());
+        String expectedContent = new FileDirectoryResponse().getResponse();
+        mockWriter().write(responseBuilder.getResponse());
+        assertTrue(output.toString().contains(expectedContent));
+    }
+
+    public void test404WriteResponse() throws IOException
+    {
+        HashMap<String, String> badResponseMap = requestMap;
+        badResponseMap.put("URI", "/wat");
+        ResponseBuilder badResponseBuilder = new ResponseBuilder(badResponseMap, routeMap);
+        mockWriter().write(badResponseBuilder.getResponse());
+        assertTrue(output.toString().contains(BAD_RESPONSE));
+    }
+
+    public PrintStream mockWriter()
+    {
+        output = new ByteArrayOutputStream();
+        return new PrintStream(output);
     }
 
 }
