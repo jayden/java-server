@@ -13,9 +13,9 @@ public class RequestProcessorTest extends TestCase
         requestProcessor = new RequestProcessor(mockReader(GET_REQUEST));
     }
 
-    private BufferedReader mockReader(String request)
+    private InputStream mockReader(String request)
     {
-        return new BufferedReader(new StringReader(request));
+        return new ByteArrayInputStream(request.getBytes());
     }
 
     public void testGetSplitRequest()
