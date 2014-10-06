@@ -2,6 +2,8 @@ package com.jayden.server;
 
 import junit.framework.*;
 import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class ResponseBuilderTest extends TestCase
@@ -84,6 +86,20 @@ public class ResponseBuilderTest extends TestCase
         String expectedContent = new FileDirectoryResponse().getResponse();
         mockWriter().write(responseBuilder.getResponse());
         assertTrue(output.toString().contains(expectedContent));
+    }
+
+    public void testTimeResponse() throws IOException
+    {
+        HashMap<String, String> timeResponseMap = requestMap;
+        timeResponseMap.put("URI", "/echo");
+        ResponseBuilder timeResponseBuilder = new ResponseBuilder(timeResponseMap, routeMap);
+
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+        Date date = new Date();
+        String expectedTime = dateFormat.format(date);
+
+        mockWriter().write(timeResponseBuilder.getResponse());
+        assertTrue(output.toString().contains(expectedTime));
     }
 
     public void test404WriteResponse() throws IOException
