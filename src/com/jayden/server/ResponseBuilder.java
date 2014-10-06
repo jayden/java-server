@@ -97,7 +97,7 @@ public class ResponseBuilder {
     public void setDefaultHeader()
     {
         setHeader("Content-Type", "text/html;charset=utf-8");
-        setHeader("Content-Length", Integer.toString(0));
+        setHeader("Content-Length", Integer.toString(getContent().length()));
         setHeader("Server", "Jayden");
     }
 }

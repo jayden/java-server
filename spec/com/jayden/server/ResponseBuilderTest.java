@@ -12,7 +12,7 @@ public class ResponseBuilderTest extends TestCase
     private ResponseBuilder responseBuilder;
     private final String CRLF = "\r\n";
     private final String BAD_RESPONSE = "HTTP/1.1 404 Not Found\r\n";
-    private final String FAKE_RESPONSE = "HTTP/1.1 200 OK\r\n";
+    private final String OK_RESPONSE = "HTTP/1.1 200 OK\r\n";
     private final String DEFAULT_HEADER = "Content-Length: 0\r\nContent-Type: text/html;charset=utf-8\r\nServer: Jayden";
 
     private static final HashMap<String, String> requestMap;
@@ -40,7 +40,7 @@ public class ResponseBuilderTest extends TestCase
     public void testGetServerResponse() throws Exception
     {
         responseBuilder.setStatus(200);
-        assertEquals(FAKE_RESPONSE, responseBuilder.statusLine());
+        assertEquals(OK_RESPONSE, responseBuilder.statusLine());
     }
 
     public void testSetStatusCodes() throws Exception
@@ -85,7 +85,17 @@ public class ResponseBuilderTest extends TestCase
     {
         String expectedContent = new FileDirectoryResponse().getResponse();
         mockWriter().write(responseBuilder.getResponse());
+        assertTrue(output.toString().contains(OK_RESPONSE));
         assertTrue(output.toString().contains(expectedContent));
+    }
+
+    public void test404WriteResponse() throws IOException
+    {
+        HashMap<String, String> badResponseMap = requestMap;
+        badResponseMap.put("URI", "/wat");
+        ResponseBuilder badResponseBuilder = new ResponseBuilder(badResponseMap, routeMap);
+        mockWriter().write(badResponseBuilder.getResponse());
+        assertTrue(output.toString().contains(BAD_RESPONSE));
     }
 
     public void testTimeResponse() throws IOException
@@ -99,16 +109,8 @@ public class ResponseBuilderTest extends TestCase
         String expectedTime = dateFormat.format(date);
 
         mockWriter().write(timeResponseBuilder.getResponse());
+        assertTrue(output.toString().contains(OK_RESPONSE));
         assertTrue(output.toString().contains(expectedTime));
-    }
-
-    public void test404WriteResponse() throws IOException
-    {
-        HashMap<String, String> badResponseMap = requestMap;
-        badResponseMap.put("URI", "/wat");
-        ResponseBuilder badResponseBuilder = new ResponseBuilder(badResponseMap, routeMap);
-        mockWriter().write(badResponseBuilder.getResponse());
-        assertTrue(output.toString().contains(BAD_RESPONSE));
     }
 
     public PrintStream mockWriter()
