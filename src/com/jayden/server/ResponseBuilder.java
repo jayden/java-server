@@ -36,7 +36,7 @@ public class ResponseBuilder {
             setContent(routes.get(request.get("URI")).getResponse());
         else
         {
-            setContent("");
+            setContent("Error: This page doesn't exist!");
             setStatus(404);
         }
 
