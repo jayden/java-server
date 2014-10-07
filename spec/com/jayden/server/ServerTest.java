@@ -69,11 +69,6 @@ public class ServerTest extends TestCase
         server = new MockServer(port);
     }
 
-    public void tearDown()
-    {
-        server.shutDown();
-    }
-
     public void testAddRoutes()
     {
         String route = "/";
@@ -89,6 +84,7 @@ public class ServerTest extends TestCase
         connect(port);
 
         assertEquals(1, server.getConnectionsCount());
+        server.shutDown();
     }
 
     public void testSimultaneousConnections() throws IOException
@@ -98,6 +94,7 @@ public class ServerTest extends TestCase
         connect(port);
 
         assertEquals(2, server.getConnectionsCount());
+        server.shutDown();
     }
 
     public void testManyConnections()
@@ -107,6 +104,7 @@ public class ServerTest extends TestCase
             connect(port);
 
         assertEquals(50, server.getConnectionsCount());
+        server.shutDown();
     }
 
     private void connect(int port)

@@ -18,8 +18,9 @@ public class RequestProcessorTest extends TestCase
         return new ByteArrayInputStream(request.getBytes());
     }
 
-    public void testGetSplitRequest()
+    public void testGetSplitRequest() throws IOException
     {
+        requestProcessor.process();
         assertEquals("GET", requestProcessor.getRequestMethod());
         assertEquals("/", requestProcessor.getRequestURI());
         assertEquals("HTTP/1.1", requestProcessor.getRequestProtocol());

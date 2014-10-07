@@ -14,7 +14,6 @@ public class RequestProcessor
     public RequestProcessor(InputStream inputStream) throws IOException
     {
         this.inputStream = inputStream;
-        process();
     }
 
     public void process() throws IOException
