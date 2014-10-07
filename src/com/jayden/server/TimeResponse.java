@@ -11,13 +11,14 @@ public class TimeResponse extends Response
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         Date date = new Date();
 
-        try {
+        try
+        {
             Thread.sleep(4000);
         }
         catch(InterruptedException e)
         {
         }
 
-        return "Hello World! " + dateFormat.format(date);
+        return "Hello world: " + dateFormat.format(date);
     }
 }

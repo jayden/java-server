@@ -11,7 +11,8 @@ import java.util.concurrent.Executors;
 class MockServer extends Server
 {
     private int port;
-    private static int connections = 0;
+    private int connectionsCount = 0;
+    private ServerSocket serverSocket;
 
     public MockServer(int port)
     {
@@ -23,13 +24,13 @@ class MockServer extends Server
     {
         try
         {
-            ServerSocket serverSocket = new ServerSocket(port);
-            ExecutorService executor = Executors.newFixedThreadPool(10);
+            serverSocket = new ServerSocket(port);
+            ExecutorService executor = Executors.newFixedThreadPool(50);
 
             while(true)
             {
                 Socket socket = serverSocket.accept();
-                connections++;
+                connectionsCount++;
                 Worker worker = new Worker(socket, getRoutes());
                 executor.execute(worker);
             }
@@ -39,16 +40,24 @@ class MockServer extends Server
         }
     }
 
-    public int getConnections()
+    public int getConnectionsCount()
     {
-        return connections;
+        return connectionsCount;
     }
 
-    public void reset()
+    public void shutDown()
     {
-        connections = 0;
+        try
+        {
+            serverSocket.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 }
+
 
 public class ServerTest extends TestCase
 {
@@ -60,7 +69,10 @@ public class ServerTest extends TestCase
         server = new MockServer(port);
     }
 
-    public void tearDown() { server.reset(); }
+    public void tearDown()
+    {
+        server.shutDown();
+    }
 
     public void testAddRoutes()
     {
@@ -76,7 +88,7 @@ public class ServerTest extends TestCase
         server.start();
         connect(port);
 
-        assertEquals(1, server.getConnections());
+        assertEquals(1, server.getConnectionsCount());
     }
 
     public void testSimultaneousConnections() throws IOException
@@ -85,16 +97,16 @@ public class ServerTest extends TestCase
         connect(port);
         connect(port);
 
-        assertEquals(2, server.getConnections());
+        assertEquals(2, server.getConnectionsCount());
     }
 
     public void testManyConnections()
     {
         server.start();
-        for(int i = 0; i < 10; i++)
+        for(int i = 0; i < 50; i++)
             connect(port);
 
-        assertEquals(10, server.getConnections());
+        assertEquals(50, server.getConnectionsCount());
     }
 
     private void connect(int port)

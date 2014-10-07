@@ -33,6 +33,9 @@ public class Server implements Runnable
     {
         try
         {
+            System.out.println("Server started on port 8000");
+            System.out.println("Press Ctrl-C to shutdown");
+
             ExecutorService executor = Executors.newFixedThreadPool(100);
             serverSocket = new ServerSocket(port);
 
@@ -46,6 +49,7 @@ public class Server implements Runnable
         }
         catch (IOException e)
         {
+            e.printStackTrace();
         }
     }
 
