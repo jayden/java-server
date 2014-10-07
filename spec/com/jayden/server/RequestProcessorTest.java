@@ -24,6 +24,4 @@ public class RequestProcessorTest extends TestCase
         assertEquals("/", requestProcessor.getRequestURI());
         assertEquals("HTTP/1.1", requestProcessor.getRequestProtocol());
     }
-
-
 }

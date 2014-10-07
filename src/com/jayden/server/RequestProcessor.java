@@ -6,7 +6,6 @@ import java.util.HashMap;
 public class RequestProcessor
 {
     private final String SP = " ";
-    private String[] requestArray;
     private String requestMethod;
     private String requestURI;
     private String requestProtocol;
@@ -23,10 +22,12 @@ public class RequestProcessor
         try {
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
             while (!bufferedReader.ready())
                 Thread.sleep(100);
+
             String requestLine = bufferedReader.readLine();
-            requestArray = requestLine.split(SP);
+            String[] requestArray = requestLine.split(SP);
             requestMethod = requestArray[0];
             requestURI = requestArray[1];
             requestProtocol = requestArray[2];
