@@ -1,5 +1,7 @@
 package com.jayden.server;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 
@@ -9,7 +11,8 @@ public class ResponseBuilder {
     private static final String CRLF = "\r\n";
     private static final String httpVersion = "HTTP/1.1";
     private int status = 200;
-    private String content = "";
+    private byte[] content = null;
+    private String contentType;
     private static final HashMap<Integer, String> statusCodes = new HashMap<Integer, String>();
     private HashMap<String, String> headers = new HashMap<String, String>();
     private HashMap<String, String> request;
@@ -30,14 +33,29 @@ public class ResponseBuilder {
     public byte[] getResponse()
     {
         if (routes.containsKey(request.get("URI")))
+        {
             setContent(routes.get(request.get("URI")).getResponse(request));
+            setContentType(routes.get(request.get("URI")));
+        }
         else
         {
-            setContent("Error: This page doesn't exist!");
+            setContent("Error: This page doesn't exist!".getBytes());
             setStatus(404);
         }
 
-        return (statusLine() + getHeader() + CRLF + getContent()).getBytes();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try
+        {
+            byte[] responseHeader = (statusLine() + getHeader() + CRLF).getBytes();
+            byteArrayOutputStream.write(responseHeader);
+            byteArrayOutputStream.write(getContent());
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        return byteArrayOutputStream.toByteArray();
     }
 
     public void setStatus(int status)
@@ -81,20 +99,25 @@ public class ResponseBuilder {
         return header;
     }
 
-    public void setContent(String content)
+    public void setContent(byte[] content)
     {
         this.content = content;
     }
 
-    public String getContent()
+    public byte[] getContent()
     {
         return content;
     }
 
     public void setDefaultHeader()
     {
-        setHeader("Content-Type", "text/html;charset=utf-8");
-        setHeader("Content-Length", Integer.toString(getContent().length()));
+        setHeader("Content-Type", contentType);
+        setHeader("Content-Length", Integer.toString(getContent().length));
         setHeader("Server", "Jayden");
+    }
+
+    public void setContentType(Response response)
+    {
+        contentType = response.getContentType();
     }
 }

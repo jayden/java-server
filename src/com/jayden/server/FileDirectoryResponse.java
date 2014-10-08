@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 public class FileDirectoryResponse implements Response
 {
-    public String getResponse(HashMap<String, String> request)
+    public byte[] getResponse(HashMap<String, String> request)
     {
         File directory = getFile("/public");
         String directoryString = "<html><body>";
@@ -15,11 +15,16 @@ public class FileDirectoryResponse implements Response
 
         }
         directoryString += "</body></html>";
-        return directoryString;
+        return directoryString.getBytes();
     }
 
     public File getFile(String relativePath)
     {
         return new File(System.getProperty("user.dir") + relativePath);
+    }
+
+    public String getContentType()
+    {
+        return "text/html";
     }
 }

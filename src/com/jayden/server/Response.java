@@ -4,5 +4,6 @@ import java.util.HashMap;
 
 public interface Response
 {
-    public String getResponse(HashMap<String, String> request);
+    public byte[] getResponse(HashMap<String, String> request);
+    public String getContentType();
 }

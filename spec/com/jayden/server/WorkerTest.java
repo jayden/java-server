@@ -23,8 +23,12 @@ public class WorkerTest extends TestCase
         routeMap = new HashMap<String, Response>();
         routeMap.put("/wat", new Response() {
             @Override
-            public String getResponse(HashMap<String, String> request) {
-                return "wat bro";
+            public byte[] getResponse(HashMap<String, String> request) {
+                return "wat bro".getBytes();
+            }
+            public String getContentType()
+            {
+                return "text/plain";
             }
         });
     }

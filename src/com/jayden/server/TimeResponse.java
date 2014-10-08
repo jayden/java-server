@@ -6,7 +6,7 @@ import java.util.*;
 
 public class TimeResponse implements Response
 {
-    public String getResponse(HashMap<String, String> request)
+    public byte[] getResponse(HashMap<String, String> request)
     {
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         Date date = new Date();
@@ -19,6 +19,11 @@ public class TimeResponse implements Response
         {
         }
 
-        return "Hello world: " + dateFormat.format(date);
+        return ("Hello world: " + dateFormat.format(date)).getBytes();
+    }
+
+    public String getContentType()
+    {
+        return "text/plain";
     }
 }
