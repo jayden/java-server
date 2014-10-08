@@ -1,5 +1,8 @@
 package com.jayden.server;
 
+import java.io.File;
+import java.util.*;
+
 public class Main
 {
     private static final String PORT_FLAG = "-p";
@@ -10,10 +13,13 @@ public class Main
     public static void main(String args[])
     {
         parseArguments(args);
+        ArrayList<String> fileList = getDirectoryContents();
         Server server = new Server(port);
 
         server.addRoute("/", new FileDirectoryResponse());
         server.addRoute("/echo", new TimeResponse());
+        for(String file : fileList)
+            server.addRoute(file, new FileResponse(directory));
 
         server.start();
     }
@@ -31,5 +37,16 @@ public class Main
                 directory = args[i+1];
             }
         }
+    }
+
+    private static ArrayList<String> getDirectoryContents()
+    {
+        ArrayList<String> fileList = new ArrayList<String>();
+        File[] files = new File(System.getProperty("user.dir") + directory).listFiles();
+        for (File file : files)
+        {
+            fileList.add("/" + file.getName());
+        }
+        return fileList;
     }
 }

@@ -30,7 +30,7 @@ public class ResponseBuilder {
     public byte[] getResponse()
     {
         if (routes.containsKey(request.get("URI")))
-            setContent(routes.get(request.get("URI")).getResponse());
+            setContent(routes.get(request.get("URI")).getResponse(request));
         else
         {
             setContent("Error: This page doesn't exist!");

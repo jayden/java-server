@@ -2,7 +2,7 @@ package com.jayden.server;
 
 import junit.framework.*;
 import java.io.File;
-
+import java.util.HashMap;
 
 public class FileDirectoryResponseTest extends TestCase
 {
@@ -15,13 +15,17 @@ public class FileDirectoryResponseTest extends TestCase
 
     public void testGetResponse()
     {
-       File directory = new File(System.getProperty("user.dir") + "/public");
-       String expectedResponse = "";
-       for(String file : directory.list())
-       {
-           expectedResponse += file + "\n";
-       }
+        File directory = new File(System.getProperty("user.dir") + "/public");
+        HashMap<String, String> response = new HashMap<String, String>();
+        response.put("URI", "/");
+        String expectedResponse = "<html><body>";
+        for(String fileName : directory.list())
+        {
+            expectedResponse += "<a href=\"" + "/" + fileName + "\">" + fileName + "</a><br />\r\n";
 
-       assertEquals(fileDirectoryResponse.getResponse(), expectedResponse);
+        }
+        expectedResponse += "</body></html>";
+
+       assertEquals(fileDirectoryResponse.getResponse(response), expectedResponse);
     }
 }

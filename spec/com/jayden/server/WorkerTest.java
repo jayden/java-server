@@ -18,11 +18,12 @@ public class WorkerTest extends TestCase
             "wat bro";
 
     private static final HashMap<String, Response> routeMap;
-    static{
+    static
+    {
         routeMap = new HashMap<String, Response>();
         routeMap.put("/wat", new Response() {
             @Override
-            public String getResponse() {
+            public String getResponse(HashMap<String, String> request) {
                 return "wat bro";
             }
         });

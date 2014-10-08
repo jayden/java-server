@@ -83,7 +83,7 @@ public class ResponseBuilderTest extends TestCase
 
     public void testFileDirectoryResponse() throws IOException
     {
-        String expectedContent = new FileDirectoryResponse().getResponse();
+        String expectedContent = new FileDirectoryResponse().getResponse(requestMap);
         mockWriter().write(responseBuilder.getResponse());
         assertTrue(output.toString().contains(OK_RESPONSE));
         assertTrue(output.toString().contains(expectedContent));

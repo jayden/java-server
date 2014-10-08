@@ -23,6 +23,9 @@ public class Worker implements Runnable
             RequestProcessor requestProcessor = new RequestProcessor(getInputStream());
             requestProcessor.process();
             HashMap<String, String> request = requestProcessor.getRequest();
+
+            request.put("Port", Integer.toString(clientSocket.getLocalPort()));
+
             byte[] response = new ResponseBuilder(request, this.routes).getResponse();
             getOutputStream().write(response);
             clientSocket.close();

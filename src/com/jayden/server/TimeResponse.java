@@ -6,7 +6,7 @@ import java.util.*;
 
 public class TimeResponse implements Response
 {
-    public String getResponse()
+    public String getResponse(HashMap<String, String> request)
     {
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         Date date = new Date();

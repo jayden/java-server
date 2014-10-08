@@ -5,6 +5,7 @@ import junit.framework.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 public class TimeResponseTest extends TestCase
 {
@@ -20,7 +21,7 @@ public class TimeResponseTest extends TestCase
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         Date date = new Date();
         String expectedString = dateFormat.format(date);
-        assertTrue(timeResponse.getResponse().contains(expectedString));
+        assertTrue(timeResponse.getResponse(new HashMap<String, String>()).contains(expectedString));
     }
 
 }
