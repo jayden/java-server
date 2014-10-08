@@ -6,9 +6,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertThat;
-
 public class TimeResponseTest extends TestCase
 {
     private TimeResponse timeResponse;
@@ -16,11 +13,6 @@ public class TimeResponseTest extends TestCase
     public void setUp()
     {
         timeResponse = new TimeResponse();
-    }
-
-    public void testInstanceOfResponse()
-    {
-        assertThat(timeResponse, instanceOf(Response.class));
     }
 
     public void testGetResponse()

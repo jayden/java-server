@@ -1,8 +1,6 @@
 package com.jayden.server;
 
-import java.util.*;
-
-public abstract class Response
+public interface Response
 {
-    public abstract String getResponse();
+    public String getResponse();
 }

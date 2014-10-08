@@ -71,8 +71,8 @@ public class ServerTest extends TestCase
 
     public void testAddRoutes()
     {
-        String route = "/";
-        Response response = new FileDirectoryResponse();
+        String route = "/echo";
+        Response response = new TimeResponse();
         server.addRoute(route, response);
 
         assertTrue(server.getRoutes().containsKey(route));

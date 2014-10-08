@@ -4,7 +4,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class TimeResponse extends Response
+public class TimeResponse implements Response
 {
     public String getResponse()
     {

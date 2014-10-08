@@ -1,11 +1,8 @@
 package com.jayden.server;
 
 import junit.framework.*;
-
 import java.io.File;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertThat;
 
 public class FileDirectoryResponseTest extends TestCase
 {
@@ -16,15 +13,9 @@ public class FileDirectoryResponseTest extends TestCase
         fileDirectoryResponse = new FileDirectoryResponse();
     }
 
-
-    public void testInstanceOfResponse()
-    {
-        assertThat(fileDirectoryResponse, instanceOf(Response.class));
-    }
-
     public void testGetResponse()
     {
-       File directory = new File(System.getProperty("user.dir") + "/");
+       File directory = new File(System.getProperty("user.dir") + "/public");
        String expectedResponse = "";
        for(String file : directory.list())
        {
