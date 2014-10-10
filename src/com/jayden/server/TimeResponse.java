@@ -26,4 +26,9 @@ public class TimeResponse implements Response
     {
         return "text/plain";
     }
+
+    public int getStatus()
+    {
+        return 200;
+    }
 }

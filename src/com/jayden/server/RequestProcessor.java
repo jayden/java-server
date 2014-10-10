@@ -10,6 +10,7 @@ public class RequestProcessor
     private String requestURI;
     private String requestProtocol;
     private InputStream inputStream;
+    private BufferedReader bufferedReader;
 
     public RequestProcessor(InputStream inputStream) throws IOException
     {
@@ -20,12 +21,16 @@ public class RequestProcessor
     {
         try {
             InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            bufferedReader = new BufferedReader(inputStreamReader);
 
             while (!bufferedReader.ready())
                 Thread.sleep(100);
 
             String requestLine = bufferedReader.readLine();
+
+            System.out.println("\n#####INCOMING REQUEST#####\n");
+            System.out.println(requestLine);
+
             String[] requestArray = requestLine.split(SP);
             requestMethod = requestArray[0];
             requestURI = requestArray[1];
@@ -43,6 +48,39 @@ public class RequestProcessor
         processedRequest.put("Method", requestMethod);
         processedRequest.put("URI", requestURI);
         processedRequest.put("Protocol", requestProtocol);
+
+        try
+        {
+            while (!bufferedReader.ready())
+            {
+                Thread.sleep(100);
+            }
+
+            while (bufferedReader.ready())
+            {
+                String requestLine = bufferedReader.readLine();
+                String[] requestArray = requestLine.split(SP);
+
+                System.out.println(requestLine);
+
+                if (requestArray.length > 1)
+                {
+                    processedRequest.put(requestArray[0], requestArray[1]);
+                    if (requestArray[0].equals("Authorization:"))
+                        processedRequest.put("Authorization:", requestArray[2]);
+                }
+            }
+
+            System.out.println("#####END OF REQUEST#####\n");
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
 
         return processedRequest;
     }

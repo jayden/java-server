@@ -39,6 +39,11 @@ public class FileResponse implements Response
         return encoded;
     }
 
+    public int getStatus()
+    {
+        return 200;
+    }
+
     public String getContentType()
     {
         if (imageFileExtensions.contains(getFileExtension(filename)))

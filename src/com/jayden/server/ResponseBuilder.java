@@ -10,7 +10,7 @@ public class ResponseBuilder {
     private static final String SP = " ";
     private static final String CRLF = "\r\n";
     private static final String httpVersion = "HTTP/1.1";
-    private int status = 200;
+    private int status = 404;
     private byte[] content = null;
     private String contentType;
     private static final HashMap<Integer, String> statusCodes = new HashMap<Integer, String>();
@@ -21,6 +21,7 @@ public class ResponseBuilder {
     static
     {
         statusCodes.put(200, "OK");
+        statusCodes.put(401, "Unauthorized");
         statusCodes.put(404, "Not Found");
     }
 
@@ -34,13 +35,14 @@ public class ResponseBuilder {
     {
         if (routes.containsKey(request.get("URI")))
         {
-            setContent(routes.get(request.get("URI")).getResponse(request));
-            setContentType(routes.get(request.get("URI")));
+            Response response = routes.get(request.get("URI"));
+            setContent(response.getResponse(request));
+            setStatus(response.getStatus());
+            setContentType(response);
         }
         else
         {
             setContent("Error: This page doesn't exist!".getBytes());
-            setStatus(404);
         }
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

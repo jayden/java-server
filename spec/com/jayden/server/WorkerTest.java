@@ -30,6 +30,7 @@ public class WorkerTest extends TestCase
             {
                 return "text/plain";
             }
+            public int getStatus() { return 200; }
         });
     }
 

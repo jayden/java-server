@@ -16,10 +16,12 @@ public class Main
         ArrayList<String> fileList = getDirectoryContents();
         Server server = new Server(port);
 
-        server.addRoute("/", new FileDirectoryResponse());
-        server.addRoute("/echo", new TimeResponse());
         for(String file : fileList)
             server.addRoute(file, new FileResponse(directory));
+
+        server.addRoute("/", new FileDirectoryResponse());
+        server.addRoute("/echo", new TimeResponse());
+        server.addRoute("/logs", new AuthResponse(directory));
 
         server.start();
     }

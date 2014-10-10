@@ -27,4 +27,9 @@ public class FileDirectoryResponse implements Response
     {
         return "text/html";
     }
+
+    public int getStatus()
+    {
+        return 200;
+    }
 }

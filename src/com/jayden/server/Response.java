@@ -6,4 +6,5 @@ public interface Response
 {
     public byte[] getResponse(HashMap<String, String> request);
     public String getContentType();
+    public int getStatus();
 }
