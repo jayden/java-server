@@ -1,5 +1,6 @@
 package com.jayden.server;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
@@ -8,6 +9,7 @@ public class FileResponse implements Response
 {
     private String directory;
     private String filename;
+    private int status = 200;
 
     private static final ArrayList<String> imageFileExtensions = new ArrayList<String>();
     static
@@ -26,9 +28,16 @@ public class FileResponse implements Response
     {
         byte[] encoded = null;
         filename = request.get("URI");
+        String filePath = System.getProperty("user.dir") + directory + filename;
+        String method = request.get("Method");
+        if (isPostOrPut(method) && fileExists(filePath))
+        {
+            status = 405;
+            return "Method Not Allowed!".getBytes();
+        }
+
         try
         {
-            String filePath = System.getProperty("user.dir") + directory + filename;
             encoded = Files.readAllBytes(Paths.get(filePath));
         }
         catch (IOException e)
@@ -39,9 +48,28 @@ public class FileResponse implements Response
         return encoded;
     }
 
+    private boolean isPostOrPut(String method)
+    {
+        boolean isPost = method.equals("POST");
+        boolean isPut = method.equals("PUT");
+
+        return isPost || isPut;
+    }
+
     public int getStatus()
     {
-        return 200;
+        return status;
+    }
+
+    private boolean fileExists(String filename)
+    {
+        boolean exists = false;
+        File file = new File(filename);
+
+        if (file.exists())
+            exists = true;
+
+        return exists;
     }
 
     public String getContentType()

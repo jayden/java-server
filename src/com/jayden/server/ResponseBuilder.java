@@ -23,6 +23,7 @@ public class ResponseBuilder {
         statusCodes.put(200, "OK");
         statusCodes.put(401, "Unauthorized");
         statusCodes.put(404, "Not Found");
+        statusCodes.put(405, "Method Not Allowed");
     }
 
     public ResponseBuilder(HashMap<String, String> request, HashMap<String, Response> routes)
