@@ -9,6 +9,7 @@ public class RequestProcessor
     private String requestMethod;
     private String requestURI;
     private String requestProtocol;
+    private String requestParameters = "";
     private InputStream inputStream;
     private BufferedReader bufferedReader;
 
@@ -35,6 +36,14 @@ public class RequestProcessor
             requestMethod = requestArray[0];
             requestURI = requestArray[1];
             requestProtocol = requestArray[2];
+
+            if (requestURI.contains("?"))
+            {
+                String URI = requestURI.split("\\?")[0];
+                requestParameters = requestURI.split("\\?")[1];
+                requestURI = URI;
+            }
+
         }
         catch (InterruptedException e)
         {
@@ -47,6 +56,7 @@ public class RequestProcessor
 
         processedRequest.put("Method", requestMethod);
         processedRequest.put("URI", requestURI);
+        processedRequest.put("Parameters", requestParameters);
         processedRequest.put("Protocol", requestProtocol);
 
         try

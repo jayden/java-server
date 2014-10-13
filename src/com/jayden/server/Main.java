@@ -22,6 +22,7 @@ public class Main
         server.addRoute("/", new FileDirectoryResponse());
         server.addRoute("/echo", new TimeResponse());
         server.addRoute("/logs", new AuthResponse(directory));
+        server.addRoute("/parameters", new ParameterResponse());
 
         server.start();
     }
