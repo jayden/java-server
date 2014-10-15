@@ -11,7 +11,6 @@ public class Server implements Runnable
 {
     private int port;
     private HashMap<String, Response> routes = null;
-    private ServerSocket serverSocket;
 
     public Server(int port)
     {
@@ -37,7 +36,7 @@ public class Server implements Runnable
             System.out.println("*Press 'Ctrl-C' to shutdown");
 
             ExecutorService executor = Executors.newCachedThreadPool();
-            serverSocket = new ServerSocket(port, 5000);
+            ServerSocket serverSocket = new ServerSocket(port, 5000);
 
             while(true)
             {

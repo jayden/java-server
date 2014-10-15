@@ -26,6 +26,6 @@ public class FileDirectoryResponseTest extends TestCase
         }
         expectedResponse += "</body></html>";
 
-       assertEquals(fileDirectoryResponse.getResponse(response), expectedResponse.getBytes());
+       assertEquals(new String(fileDirectoryResponse.getResponse(response)), expectedResponse);
     }
 }

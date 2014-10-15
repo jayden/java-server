@@ -21,7 +21,7 @@ public class TimeResponseTest extends TestCase
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         Date date = new Date();
         String expectedString = dateFormat.format(date);
-        assertEquals(timeResponse.getResponse(new HashMap<String, String>()), ("Hello world: " + expectedString).getBytes());
+        assertEquals(new String(timeResponse.getResponse(new HashMap<String, String>())), ("Hello world: " + expectedString));
     }
 
 }

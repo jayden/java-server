@@ -12,9 +12,9 @@ public class AuthResponseTest extends TestCase
         authorizedRequest.put("Method", "GET");
         authorizedRequest.put("URI", "/logs");
         authorizedRequest.put("Protocol,", "HTTP/1.1");
-        authorizedRequest.put("Authorization:", "YWRtaW46aHVudGVyMg==");
-        authorizedRequest.put("Connection:", "close");
-        authorizedRequest.put("Host:", "localhost:5000");
+        authorizedRequest.put("Authorization", "Basic YWRtaW46aHVudGVyMg==");
+        authorizedRequest.put("Connection", "close");
+        authorizedRequest.put("Host", "localhost:5000");
     }
 
     private static final HashMap<String, String> unauthorizedRequest;
@@ -24,8 +24,8 @@ public class AuthResponseTest extends TestCase
         unauthorizedRequest.put("Method", "GET");
         unauthorizedRequest.put("URI", "/logs");
         unauthorizedRequest.put("Protocol,", "HTTP/1.1");
-        unauthorizedRequest.put("Connection:", "close");
-        unauthorizedRequest.put("Host:", "localhost:5000");
+        unauthorizedRequest.put("Connection", "close");
+        unauthorizedRequest.put("Host", "localhost:5000");
     }
     private AuthResponse response;
 
@@ -45,7 +45,8 @@ public class AuthResponseTest extends TestCase
 
     public void testDecodeCredentials()
     {
-        String credentials = response.decodedCredentials(authorizedRequest.get("Authorization:"));
+        String encodedCredentials = authorizedRequest.get("Authorization").split(" ")[1];
+        String credentials = response.decodedCredentials(encodedCredentials);
         assertEquals(credentials, "admin:hunter2");
     }
 
@@ -57,9 +58,7 @@ public class AuthResponseTest extends TestCase
 
 
         byte[] authorizedResponse = response.getResponse(authorizedRequest);
-        assertEquals("GET /log HTTP/1.1\n" +
-                "PUT /these HTTP/1.1\n" +
-                "HEAD /requests HTTP/1.1", new String(authorizedResponse));
+        assertEquals("test logs", new String(authorizedResponse));
         assertEquals(response.getStatus(), 200);
     }
 

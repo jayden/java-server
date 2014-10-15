@@ -2,6 +2,7 @@ package com.jayden.server;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.Map;
 
 public class RequestProcessor
 {
@@ -10,12 +11,78 @@ public class RequestProcessor
     private String requestURI;
     private String requestProtocol;
     private String requestParameters = "";
+    private String requestBody = "";
     private InputStream inputStream;
     private BufferedReader bufferedReader;
+    private HashMap<String, String> processedRequest;
 
     public RequestProcessor(InputStream inputStream) throws IOException
     {
         this.inputStream = inputStream;
+    }
+
+
+    public HashMap<String, String> getRequest()
+    {
+        processedRequest = new HashMap<String, String>();
+
+        processedRequest.put("Method", requestMethod);
+        processedRequest.put("URI", requestURI);
+        processedRequest.put("Parameters", requestParameters);
+        processedRequest.put("Protocol", requestProtocol);
+
+        try
+        {
+            String requestLine = bufferedReader.readLine();
+            while (readableRequestLine(requestLine))
+            {
+                System.out.println(requestLine);
+                String[] requestArray = requestLine.split(": ");
+
+                if (requestArray.length > 1)
+                    processedRequest.put(requestArray[0], requestArray[1]);
+
+                requestLine = bufferedReader.readLine();
+            }
+
+            if (isPostOrPut() && processedRequest.containsKey("Content-Length"))
+            {
+                int contentLength = Integer.parseInt(processedRequest.get("Content-Length"));
+                requestBody = getBody(contentLength);
+            }
+
+            processedRequest.put("Body", requestBody);
+
+            for (Map.Entry<String, String> entry : processedRequest.entrySet())
+                System.out.println(entry.getKey() + " : " + entry.getValue());
+
+            System.out.println("#####END OF REQUEST#####\n");
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        return processedRequest;
+    }
+
+    public boolean readableRequestLine(String requestLine)
+    {
+        return (requestLine != null && !requestLine.equals(""));
+    }
+
+    public boolean isPostOrPut()
+    {
+        return getRequestMethod().equals("POST") || getRequestMethod().equals("PUT");
+    }
+
+    public String getBody(int contentLength) throws IOException
+    {
+        char[] characters = new char[contentLength];
+        StringBuilder postContent = new StringBuilder();
+        bufferedReader.read(characters, 0, contentLength);
+        postContent.append(new String(characters));
+        return postContent.toString();
     }
 
     public void process() throws IOException
@@ -48,51 +115,6 @@ public class RequestProcessor
         catch (InterruptedException e)
         {
         }
-    }
-
-    public HashMap<String, String> getRequest()
-    {
-        HashMap<String, String> processedRequest = new HashMap<String, String>();
-
-        processedRequest.put("Method", requestMethod);
-        processedRequest.put("URI", requestURI);
-        processedRequest.put("Parameters", requestParameters);
-        processedRequest.put("Protocol", requestProtocol);
-
-        try
-        {
-            while (!bufferedReader.ready())
-            {
-                Thread.sleep(100);
-            }
-
-            while (bufferedReader.ready())
-            {
-                String requestLine = bufferedReader.readLine();
-                String[] requestArray = requestLine.split(SP);
-
-                System.out.println(requestLine);
-
-                if (requestArray.length > 1)
-                {
-                    processedRequest.put(requestArray[0], requestArray[1]);
-                    if (requestArray[0].equals("Authorization:"))
-                        processedRequest.put("Authorization:", requestArray[2]);
-                }
-            }
-
-            System.out.println("#####END OF REQUEST#####\n");
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        }
-
-        return processedRequest;
     }
 
     public String getRequestMethod()

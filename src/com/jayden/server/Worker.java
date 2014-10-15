@@ -1,7 +1,5 @@
 package com.jayden.server;
 
-import org.omg.CORBA.Request;
-
 import java.io.*;
 import java.net.Socket;
 import java.util.*;
@@ -11,7 +9,8 @@ public class Worker implements Runnable
     private Socket clientSocket = null;
     private HashMap<String, Response> routes;
 
-    public Worker(Socket clientSocket, HashMap<String, Response> routes) {
+    public Worker(Socket clientSocket, HashMap<String, Response> routes)
+    {
         this.clientSocket = clientSocket;
         this.routes = routes;
     }
@@ -23,8 +22,6 @@ public class Worker implements Runnable
             RequestProcessor requestProcessor = new RequestProcessor(getInputStream());
             requestProcessor.process();
             HashMap<String, String> request = requestProcessor.getRequest();
-
-            request.put("Port", Integer.toString(clientSocket.getLocalPort()));
 
             byte[] response = new ResponseBuilder(request, this.routes).getResponse();
             getOutputStream().write(response);

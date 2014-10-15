@@ -11,12 +11,11 @@ public class ParameterResponseTest extends TestCase
     {
         parameterRequest = new HashMap<String, String>();
         parameterRequest.put("Method", "GET");
-        parameterRequest.put("URI", "/parameters?variable_1=Operators%20%3C%2C%20%3E%2C%20%3D%2C%20!%3D%3B%20%2B%2C%20-%2C" +
-                "%20*%2C%20%26%2C%20%40%2C%20%23%2C%20%24%2C%20%5B%2C%20%5D%3A%20%22is%20that%20all%22%3F&variable_2=stuff");
+        parameterRequest.put("URI", "/parameters");
+        parameterRequest.put("Parameters", "variable_1=Operators%20%3C%2C%20%3E%2C%20%3D%2C%20!%3D%3B%20%2B%2C%20-%2C" +
+        "%20*%2C%20%26%2C%20%40%2C%20%23%2C%20%24%2C%20%5B%2C%20%5D%3A%20%22is%20that%20all%22%3F&variable_2=stuff");
         parameterRequest.put("Protocol", "HTTP/1.1");
     }
-    private String requestURI = parameterRequest.get("URI");
-
     public void setUp()
     {
         response = new ParameterResponse();
@@ -24,25 +23,24 @@ public class ParameterResponseTest extends TestCase
 
     public void testDecode()
     {
-        requestURI = "%26%20%5D";
+        String requestURI = "%26%20%5D";
         response = new ParameterResponse();
         assertEquals(response.decodeValue(requestURI), "& ]");
     }
 
-    public void testGetParamMap()
+    public void testGetParamList()
     {
-        HashMap<String, String> paramMap = new HashMap<String, String>();
-        paramMap.put("variable_1", "Operators <, >, =, !=; +, -, *, &, @, #, $, [, ]: \"is that all\"?");
-        paramMap.put("variable_2", "stuff");
+        response.getResponse(parameterRequest);
+        ArrayList<String> paramList = new ArrayList<String>();
+        paramList.add("variable_1 = Operators <, >, =, !=; +, -, *, &, @, #, $, [, ]: \"is that all\"?");
+        paramList.add("variable_2 = stuff");
 
-        assertEquals(response.getParamMap(), paramMap);
+        assertEquals(response.getParamList(), paramList);
     }
 
-    /*
-    public void testBuildResponse()
+    public void testGetResponse()
     {
-        String expected = "variable_1 = Operators <, >, =, !=; +, -, *, &, @, #, $, [, ]: \"is that all\"?\n" + "variable_2 = stuff\n";
-        assertEquals(response.buildResponse(), expected);
-    }*/
-
+        String expected = "variable_1 = Operators <, >, =, !=; +, -, *, &, @, #, $, [, ]: \"is that all\"?\nvariable_2 = stuff\n";
+        assertEquals(expected, new String(response.getResponse(parameterRequest)));
+    }
 }

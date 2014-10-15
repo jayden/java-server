@@ -1,7 +1,6 @@
 package com.jayden.server;
 
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -52,9 +51,10 @@ public class AuthResponse implements Response
     {
         boolean isAuthenticated = false;
 
-        if(this.request.containsKey("Authorization:"))
+        if(this.request.containsKey("Authorization"))
         {
-            String credentials = request.get("Authorization:");
+            String credentials = request.get("Authorization");
+            credentials = credentials.split(" ")[1];
             String decoded = decodedCredentials(credentials);
             if (decoded.equals("admin:hunter2"))
                 isAuthenticated = true;

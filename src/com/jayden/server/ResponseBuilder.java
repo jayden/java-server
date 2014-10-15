@@ -12,7 +12,7 @@ public class ResponseBuilder {
     private static final String httpVersion = "HTTP/1.1";
     private int status = 404;
     private byte[] content = null;
-    private String contentType;
+    private String contentType = "text/plain";
     private static final HashMap<Integer, String> statusCodes = new HashMap<Integer, String>();
     private HashMap<String, String> headers = new HashMap<String, String>();
     private HashMap<String, String> request;
@@ -21,6 +21,8 @@ public class ResponseBuilder {
     static
     {
         statusCodes.put(200, "OK");
+        statusCodes.put(206, "Partial Content");
+        statusCodes.put(307, "Temporary Redirect");
         statusCodes.put(401, "Unauthorized");
         statusCodes.put(404, "Not Found");
         statusCodes.put(405, "Method Not Allowed");
@@ -40,6 +42,9 @@ public class ResponseBuilder {
             setContent(response.getResponse(request));
             setStatus(response.getStatus());
             setContentType(response);
+
+            if (response instanceof RedirectResponse)
+                setHeader(((RedirectResponse) response).getHeader(), ((RedirectResponse) response).getHeaderValue());
         }
         else
         {
@@ -115,7 +120,10 @@ public class ResponseBuilder {
     public void setDefaultHeader()
     {
         setHeader("Content-Type", contentType);
-        setHeader("Content-Length", Integer.toString(getContent().length));
+        if (content == null)
+            setHeader("Content-Length", "0");
+        else
+            setHeader("Content-Length", Integer.toString(content.length));
         setHeader("Server", "Jayden");
     }
 

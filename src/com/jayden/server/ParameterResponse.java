@@ -1,10 +1,10 @@
 package com.jayden.server;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ParameterResponse implements Response
 {
+    private HashMap<String, String> request;
     private static final HashMap<String, String> encodingMap;
     static
     {
@@ -29,12 +29,19 @@ public class ParameterResponse implements Response
         encodingMap.put("%5B", "[");
         encodingMap.put("%5D", "]");
     }
-    private HashMap<String, String> request;
 
     public byte[] getResponse(HashMap<String, String> request)
     {
         this.request = request;
-        return buildResponse().getBytes();
+        String response = "";
+
+        ArrayList<String> params = getParamList();
+        for (String param : params)
+        {
+            response += param + "\n";
+        }
+
+        return response.getBytes();
     }
 
     public String getContentType() {
@@ -51,19 +58,19 @@ public class ParameterResponse implements Response
         return query.split("&");
     }
 
-    public HashMap<String, String> getParamMap()
+    public ArrayList<String> getParamList()
     {
         String[] params = getSeparateParams();
-        HashMap<String, String> paramMap = new HashMap<String, String>();
+        ArrayList<String> paramList = new ArrayList<String>();
         for (String param : params)
         {
             String paramName = param.split("=")[0];
             String paramValue = param.split("=")[1];
             paramValue = decodeValue(paramValue);
-            paramMap.put(paramName, paramValue);
+            paramList.add(paramName + " = " + paramValue);
         }
 
-        return paramMap;
+        return paramList;
     }
 
     public String decodeValue(String value)
@@ -75,16 +82,5 @@ public class ParameterResponse implements Response
             value = value.replace(encoding, asciiValue);
         }
         return value;
-    }
-
-    public String buildResponse()
-    {
-        String response = "";
-        HashMap<String, String> params = getParamMap();
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            response += entry.getKey() + " = " + entry.getValue() + "\n";
-        }
-
-        return response;
     }
 }

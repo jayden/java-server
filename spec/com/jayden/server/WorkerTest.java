@@ -13,7 +13,7 @@ public class WorkerTest extends TestCase
     private static final String TEST_RESPONSE =
             "HTTP/1.1 200 OK\r\n" +
             "Content-Length: 7\r\n" +
-            "Content-Type: text/html;charset=utf-8\r\n" +
+            "Content-Type: text/plain\r\n" +
             "Server: Jayden\r\n\r\n" +
             "wat bro";
 
@@ -22,7 +22,6 @@ public class WorkerTest extends TestCase
     {
         routeMap = new HashMap<String, Response>();
         routeMap.put("/wat", new Response() {
-            @Override
             public byte[] getResponse(HashMap<String, String> request) {
                 return "wat bro".getBytes();
             }

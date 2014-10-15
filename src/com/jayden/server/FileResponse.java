@@ -10,6 +10,7 @@ public class FileResponse implements Response
     private String directory;
     private String filename;
     private int status = 200;
+    private HashMap<String, String> request;
 
     private static final ArrayList<String> imageFileExtensions = new ArrayList<String>();
     static
@@ -26,7 +27,9 @@ public class FileResponse implements Response
 
     public byte[] getResponse(HashMap<String, String> request)
     {
+        this.request = request;
         byte[] encoded = null;
+        int[] range = null;
         filename = request.get("URI");
         String filePath = System.getProperty("user.dir") + directory + filename;
         String method = request.get("Method");
@@ -39,6 +42,12 @@ public class FileResponse implements Response
         try
         {
             encoded = Files.readAllBytes(Paths.get(filePath));
+            if (hasRangeHeader())
+            {
+                range = headerRange();
+                status = 206;
+                return Arrays.copyOfRange(encoded, range[0], range[1]);
+            }
         }
         catch (IOException e)
         {
@@ -46,6 +55,19 @@ public class FileResponse implements Response
         }
 
         return encoded;
+    }
+
+    private boolean hasRangeHeader()
+    {
+        return request.containsKey("Range");
+    }
+
+    private int[] headerRange()
+    {
+        String range = request.get("Range").split("=")[1];
+        int startPosition = Integer.parseInt(range.split("-")[0]);
+        int endPosition = Integer.parseInt(range.split("-")[1]) + 1;
+        return new int[]{startPosition, endPosition};
     }
 
     private boolean isPostOrPut(String method)

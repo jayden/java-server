@@ -13,7 +13,7 @@ public class ResponseBuilderTest extends TestCase
     private final String CRLF = "\r\n";
     private final String BAD_RESPONSE = "HTTP/1.1 404 Not Found\r\n";
     private final String OK_RESPONSE = "HTTP/1.1 200 OK\r\n";
-    private final String DEFAULT_HEADER = "Content-Length: 0\r\nContent-Type: text/html;charset=utf-8\r\nServer: Jayden";
+    private final String DEFAULT_HEADER = "Content-Length: 0\r\nContent-Type: text/plain\r\nServer: Jayden";
 
     private static final HashMap<String, String> requestMap;
     static
@@ -70,7 +70,7 @@ public class ResponseBuilderTest extends TestCase
     public void testSetResponseContent()
     {
         responseBuilder.setContent("watbro".getBytes());
-        assertEquals("watbro".getBytes(), responseBuilder.getContent());
+        assertEquals("watbro", new String(responseBuilder.getContent()));
     }
 
 
@@ -86,7 +86,8 @@ public class ResponseBuilderTest extends TestCase
         byte[] expectedContent = new FileDirectoryResponse().getResponse(requestMap);
         mockWriter().write(responseBuilder.getResponse());
         assertTrue(output.toString().contains(OK_RESPONSE));
-        assertEquals(output, expectedContent);
+        String header = OK_RESPONSE + responseBuilder.getHeader() + CRLF;
+        assertEquals(output.toString(),  header + new String(expectedContent));
     }
 
     public void test404WriteResponse() throws IOException
