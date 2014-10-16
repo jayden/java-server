@@ -2,31 +2,30 @@ package com.jayden.server;
 
 import java.util.HashMap;
 
-public class RedirectResponse implements Response
+public class OptionsResponse implements Response
 {
     public byte[] getResponse(HashMap<String, String> request)
     {
-
         return new byte[0];
     }
 
     public String getHeader()
     {
-        return "Location";
+        return "Allow";
     }
 
     public String getHeaderValue()
     {
-        return "http://localhost:5000/";
+        return "GET,HEAD,POST,OPTIONS,PUT";
     }
 
     public String getContentType()
     {
-       return "text/plain";
+        return "text/plain";
     }
 
     public int getStatus()
     {
-        return 307;
+        return 200;
     }
 }

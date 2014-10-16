@@ -36,7 +36,6 @@ public class RequestProcessor
             String requestLine = bufferedReader.readLine();
             while (readableRequestLine(requestLine))
             {
-                System.out.println(requestLine);
                 String[] requestArray = requestLine.split(": ");
 
                 if (requestArray.length > 1)
@@ -45,7 +44,7 @@ public class RequestProcessor
                 requestLine = bufferedReader.readLine();
             }
 
-            if (isPostOrPut() && processedRequest.containsKey("Content-Length"))
+            if (processedRequest.containsKey("Content-Length"))
             {
                 int contentLength = Integer.parseInt(processedRequest.get("Content-Length"));
                 requestBody = getBody(contentLength);
@@ -69,11 +68,6 @@ public class RequestProcessor
     public boolean readableRequestLine(String requestLine)
     {
         return (requestLine != null && !requestLine.equals(""));
-    }
-
-    public boolean isPostOrPut()
-    {
-        return getRequestMethod().equals("POST") || getRequestMethod().equals("PUT");
     }
 
     public String getBody(int contentLength) throws IOException

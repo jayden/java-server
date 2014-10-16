@@ -1,7 +1,9 @@
 package com.jayden.server;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.*;
 import java.util.*;
 
@@ -29,7 +31,6 @@ public class FileResponse implements Response
     {
         this.request = request;
         byte[] encoded = null;
-        int[] range = null;
         filename = request.get("URI");
         String filePath = System.getProperty("user.dir") + directory + filename;
         String method = request.get("Method");
@@ -39,12 +40,28 @@ public class FileResponse implements Response
             return "Method Not Allowed!".getBytes();
         }
 
+        if (method.equals("PATCH"))
+        {
+            if (etagMatches(filePath))
+            {
+                status = 204;
+                try {
+                    PrintWriter printWriter = new PrintWriter(filePath, "UTF-8");
+                    printWriter.write(request.get("Body"));
+                } catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+
         try
         {
             encoded = Files.readAllBytes(Paths.get(filePath));
             if (hasRangeHeader())
             {
-                range = headerRange();
+                int[] range = headerRange();
                 status = 206;
                 return Arrays.copyOfRange(encoded, range[0], range[1]);
             }
@@ -55,6 +72,23 @@ public class FileResponse implements Response
         }
 
         return encoded;
+    }
+
+    public boolean etagMatches(String filename)
+    {
+        boolean matches = false;
+        try
+        {
+            Path filePath = Paths.get(filename);
+            String fileEtag = DigestUtils.sha1Hex(Files.readAllBytes(filePath));
+            String requestEtag = request.get("If-Match");
+            matches = requestEtag.equals(fileEtag);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return matches;
     }
 
     private boolean hasRangeHeader()

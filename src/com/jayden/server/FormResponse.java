@@ -22,8 +22,7 @@ public class FormResponse implements Response
         byte[] response = "".getBytes();
         String filePath = System.getProperty("user.dir") + directory + "/form";
         PrintWriter printWriter;
-        try
-        {
+        try {
             if (getRequestMethod(request).equals("GET"))
             {
                 response = Files.readAllBytes(Paths.get(filePath));
@@ -32,6 +31,7 @@ public class FormResponse implements Response
             {
                 printWriter = new PrintWriter(filePath, "UTF-8");
                 printWriter.print(request.get("Body"));
+
                 printWriter.close();
             }
         }

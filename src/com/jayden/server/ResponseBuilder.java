@@ -21,6 +21,7 @@ public class ResponseBuilder {
     static
     {
         statusCodes.put(200, "OK");
+        statusCodes.put(204, "No Content");
         statusCodes.put(206, "Partial Content");
         statusCodes.put(307, "Temporary Redirect");
         statusCodes.put(401, "Unauthorized");
@@ -45,6 +46,8 @@ public class ResponseBuilder {
 
             if (response instanceof RedirectResponse)
                 setHeader(((RedirectResponse) response).getHeader(), ((RedirectResponse) response).getHeaderValue());
+            if (response instanceof OptionsResponse)
+                setHeader(((OptionsResponse) response).getHeader(), ((OptionsResponse) response).getHeaderValue());
         }
         else
         {

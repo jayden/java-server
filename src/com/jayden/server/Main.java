@@ -58,5 +58,6 @@ public class Main
         server.addRoute("/parameters", new ParameterResponse());
         server.addRoute("/form", new FormResponse(directory));
         server.addRoute("/redirect", new RedirectResponse());
+        server.addRoute("/method_options", new OptionsResponse());
     }
 }
