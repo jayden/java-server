@@ -9,12 +9,13 @@ import java.util.*;
 public class AuthResponse implements Response
 {
     private HashMap<String, String> request;
+    private final String AUTHORIZED_CREDENTIALS = "admin:hunter2";
     private String directory;
     private int status;
 
     public AuthResponse(String directory)
     {
-        this.directory = System.getProperty("user.dir") + directory;
+        this.directory = directory;
     }
 
     public byte[] getResponse(HashMap<String, String> request)
@@ -27,7 +28,8 @@ public class AuthResponse implements Response
             try
             {
                 return new String(Files.readAllBytes(Paths.get(directory + "/logs"))).getBytes();
-            } catch (IOException e)
+            }
+            catch (IOException e)
             {
                 e.printStackTrace();
             }
@@ -35,6 +37,34 @@ public class AuthResponse implements Response
 
         this.status = 401;
         return "Authentication required".getBytes();
+    }
+
+    public boolean isAuthenticated()
+    {
+        boolean isAuthenticated = false;
+
+        if(containsAuthorization())
+        {
+            String credentials = request.get("Authorization");
+            credentials = credentials.split(" ")[1];
+            String decoded = decodedCredentials(credentials);
+            if (decoded.equals(AUTHORIZED_CREDENTIALS))
+                isAuthenticated = true;
+        }
+
+        return isAuthenticated;
+    }
+
+    public boolean containsAuthorization()
+    {
+        return request.containsKey("Authorization");
+    }
+
+    public String decodedCredentials(String encodedCredentials)
+    {
+        Base64 decoder = new Base64();
+        byte[] decodedCredentials = decoder.decode(encodedCredentials);
+        return new String(decodedCredentials);
     }
 
     public String getContentType()
@@ -45,29 +75,6 @@ public class AuthResponse implements Response
     public int getStatus()
     {
         return this.status;
-    }
-
-    public boolean isAuthenticated()
-    {
-        boolean isAuthenticated = false;
-
-        if(this.request.containsKey("Authorization"))
-        {
-            String credentials = request.get("Authorization");
-            credentials = credentials.split(" ")[1];
-            String decoded = decodedCredentials(credentials);
-            if (decoded.equals("admin:hunter2"))
-                isAuthenticated = true;
-        }
-
-        return isAuthenticated;
-    }
-
-    public String decodedCredentials(String encodedCredentials)
-    {
-        Base64 decoder = new Base64();
-        byte[] decodedCredentials = decoder.decode(encodedCredentials);
-        return new String(decodedCredentials);
     }
 
     public void setRequest(HashMap<String, String> request)

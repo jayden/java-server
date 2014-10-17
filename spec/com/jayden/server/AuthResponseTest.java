@@ -31,7 +31,7 @@ public class AuthResponseTest extends TestCase
 
     public void setUp()
     {
-        response = new AuthResponse("/public");
+        response = new AuthResponse(System.getProperty("user.dir") + "/public");
     }
 
     public void testIsAuthenticated()
@@ -61,6 +61,4 @@ public class AuthResponseTest extends TestCase
         assertEquals("test logs", new String(authorizedResponse));
         assertEquals(response.getStatus(), 200);
     }
-
-
 }
