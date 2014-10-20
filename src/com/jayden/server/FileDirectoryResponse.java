@@ -9,11 +9,10 @@ public class FileDirectoryResponse implements Response
     {
         File directory = getFile("/public");
         String directoryString = "<html><body>";
+
         for(String fileName : directory.list())
-        {
             directoryString += "<a href=\"" + request.get("URI") + fileName + "\">" + fileName + "</a><br />\r\n";
 
-        }
         directoryString += "</body></html>";
         return directoryString.getBytes();
     }

@@ -20,20 +20,14 @@ public class FormResponse implements Response
     public byte[] getResponse(HashMap<String, String> request) {
         this.request = request;
         byte[] response = "".getBytes();
-        String filePath = System.getProperty("user.dir") + directory + "/form";
-        PrintWriter printWriter;
-        try {
-            if (getRequestMethod(request).equals("GET"))
-            {
-                response = Files.readAllBytes(Paths.get(filePath));
-            }
-            else
-            {
-                printWriter = new PrintWriter(filePath, "UTF-8");
-                printWriter.print(request.get("Body"));
+        String filePath = directory + "/form";
 
-                printWriter.close();
-            }
+        try
+        {
+            if (isGetRequest())
+                response = Files.readAllBytes(Paths.get(filePath));
+            else
+                writeToFile(filePath);
         }
         catch (IOException e)
         {
@@ -41,6 +35,18 @@ public class FormResponse implements Response
         }
 
         return response;
+    }
+
+    private boolean isGetRequest()
+    {
+        return getRequestMethod().equals("GET");
+    }
+
+    private void writeToFile(String filePath) throws IOException
+    {
+        PrintWriter printWriter = new PrintWriter(filePath, "UTF-8");
+        printWriter.print(request.get("Body"));
+        printWriter.close();
     }
 
     public String getContentType() {
@@ -52,7 +58,7 @@ public class FormResponse implements Response
         return status;
     }
 
-    public String getRequestMethod(HashMap<String, String> request)
+    public String getRequestMethod()
     {
         return request.get("Method");
     }

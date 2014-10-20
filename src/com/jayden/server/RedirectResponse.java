@@ -6,7 +6,6 @@ public class RedirectResponse implements Response
 {
     public byte[] getResponse(HashMap<String, String> request)
     {
-
         return new byte[0];
     }
 

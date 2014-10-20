@@ -49,7 +49,7 @@ public class ParameterResponse implements Response
     }
 
     public int getStatus() {
-        return 0;
+        return 200;
     }
 
     public String[] getSeparateParams()
