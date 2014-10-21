@@ -33,16 +33,7 @@ public class RequestProcessor
 
         try
         {
-            String requestLine = bufferedReader.readLine();
-            while (readableRequestLine(requestLine))
-            {
-                String[] requestArray = requestLine.split(": ");
-
-                if (requestArray.length > 1)
-                    processedRequest.put(requestArray[0], requestArray[1]);
-
-                requestLine = bufferedReader.readLine();
-            }
+            splitRequestHeader();
 
             if (processedRequest.containsKey("Content-Length"))
             {
@@ -51,11 +42,7 @@ public class RequestProcessor
             }
 
             processedRequest.put("Body", requestBody);
-
-            for (Map.Entry<String, String> entry : processedRequest.entrySet())
-                System.out.println(entry.getKey() + " : " + entry.getValue());
-
-            System.out.println("#####END OF REQUEST#####\n");
+            printRequestToConsole();
         }
         catch (IOException e)
         {
@@ -63,6 +50,27 @@ public class RequestProcessor
         }
 
         return processedRequest;
+    }
+
+    private void printRequestToConsole()
+    {
+        for (Map.Entry<String, String> entry : processedRequest.entrySet())
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+
+        System.out.println("#####END OF REQUEST#####\n");
+    }
+
+    public void splitRequestHeader() throws IOException
+    {
+        String requestLine = bufferedReader.readLine();
+
+        while (readableRequestLine(requestLine))
+        {
+            String[] requestArray = requestLine.split(": ");
+            if (requestArray.length > 1)
+                processedRequest.put(requestArray[0], requestArray[1]);
+            requestLine = bufferedReader.readLine();
+        }
     }
 
     public boolean readableRequestLine(String requestLine)
@@ -90,24 +98,32 @@ public class RequestProcessor
 
             String requestLine = bufferedReader.readLine();
 
-            System.out.println("\n#####INCOMING REQUEST#####\n");
+            System.out.println("#####INCOMING REQUEST#####");
             System.out.println(requestLine);
 
-            String[] requestArray = requestLine.split(SP);
-            requestMethod = requestArray[0];
-            requestURI = requestArray[1];
-            requestProtocol = requestArray[2];
-
-            if (requestURI.contains("?"))
-            {
-                String URI = requestURI.split("\\?")[0];
-                requestParameters = requestURI.split("\\?")[1];
-                requestURI = URI;
-            }
-
+            splitRequestLine(requestLine);
+            splitParameterFromURI();
         }
         catch (InterruptedException e)
         {
+        }
+    }
+
+    public void splitRequestLine(String requestLine)
+    {
+        String[] requestArray = requestLine.split(SP);
+        requestMethod = requestArray[0];
+        requestURI = requestArray[1];
+        requestProtocol = requestArray[2];
+    }
+
+    public void splitParameterFromURI()
+    {
+        if (requestURI.contains("?"))
+        {
+            String URI = requestURI.split("\\?")[0];
+            requestParameters = requestURI.split("\\?")[1];
+            requestURI = URI;
         }
     }
 
