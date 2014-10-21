@@ -5,6 +5,7 @@ import junit.framework.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -13,6 +14,12 @@ class MockServer extends Server
     private int port;
     private int connectionsCount = 0;
     private ServerSocket serverSocket;
+    private static HashMap<String, Response> routes;
+    static
+    {
+        routes = new HashMap<String, Response>();
+        routes.put("/logs", new AuthResponse(System.getProperty("user.dir") + "/public"));
+    }
 
     public MockServer(int port)
     {
@@ -31,7 +38,7 @@ class MockServer extends Server
             {
                 Socket socket = serverSocket.accept();
                 connectionsCount++;
-                Worker worker = new Worker(socket, getRoutes());
+                Worker worker = new Worker(socket, routes);
                 executor.execute(worker);
             }
         }

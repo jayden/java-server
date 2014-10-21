@@ -6,31 +6,24 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
-public class AuthResponse implements Response
-{
+public class AuthResponse implements Response {
     private HashMap<String, String> request;
     private final String AUTHORIZED_CREDENTIALS = "admin:hunter2";
     private String directory;
     private int status;
 
-    public AuthResponse(String directory)
-    {
-        this.directory = directory;
+    public AuthResponse(String directory) {
+        this.directory = directory + "/logs";
     }
 
-    public byte[] getResponse(HashMap<String, String> request)
-    {
+    public byte[] getResponse(HashMap<String, String> request) {
         this.request = request;
 
-        if (isAuthenticated())
-        {
+        if (isAuthenticated()) {
             this.status = 200;
-            try
-            {
-                return new String(Files.readAllBytes(Paths.get(directory + "/logs"))).getBytes();
-            }
-            catch (IOException e)
-            {
+            try {
+                return new String(Files.readAllBytes(Paths.get(directory))).getBytes();
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -39,12 +32,10 @@ public class AuthResponse implements Response
         return "Authentication required".getBytes();
     }
 
-    public boolean isAuthenticated()
-    {
+    public boolean isAuthenticated() {
         boolean isAuthenticated = false;
 
-        if(containsAuthorization())
-        {
+        if (containsAuthorization()) {
             String credentials = request.get("Authorization");
             credentials = credentials.split(" ")[1];
             String decoded = decodedCredentials(credentials);
@@ -55,31 +46,30 @@ public class AuthResponse implements Response
         return isAuthenticated;
     }
 
-    public boolean containsAuthorization()
-    {
+    public boolean containsAuthorization() {
         return request.containsKey("Authorization");
     }
 
-    public String decodedCredentials(String encodedCredentials)
-    {
+    public String decodedCredentials(String encodedCredentials) {
         Base64 decoder = new Base64();
         byte[] decodedCredentials = decoder.decode(encodedCredentials);
         return new String(decodedCredentials);
     }
 
-    public String getContentType()
-    {
+    public String getContentType() {
         return "text/plain";
     }
 
-    public int getStatus()
-    {
+    public int getStatus() {
         return this.status;
     }
 
-    public void setRequest(HashMap<String, String> request)
-    {
+    public void setRequest(HashMap<String, String> request) {
         this.request = request;
     }
 
+    public String getLogDirectory()
+    {
+        return directory;
+    }
 }

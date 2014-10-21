@@ -15,7 +15,7 @@ public class RequestProcessorTest extends TestCase
     {
         String request = "GET / HTTP/1.1";
         RequestProcessor requestProcessor = new RequestProcessor(mockReader(request));
-        requestProcessor.process();
+        requestProcessor.getRequest();
 
         assertEquals("GET", requestProcessor.getRequestMethod());
         assertEquals("/", requestProcessor.getRequestURI());
@@ -26,7 +26,6 @@ public class RequestProcessorTest extends TestCase
     {
         String request = "GET / HTTP/1.1\nHost: watbro\nConnection: keep-alive\nUser-Agent: fake-agent";
         RequestProcessor requestProcessor = new RequestProcessor(mockReader(request));
-        requestProcessor.process();
         HashMap<String, String> requestMap = requestProcessor.getRequest();
 
         assertEquals(requestMap.get("Method"), "GET");
@@ -37,7 +36,6 @@ public class RequestProcessorTest extends TestCase
     {
         String request = "GET /location?name=value HTTP/1.1";
         RequestProcessor requestProcessor = new RequestProcessor(mockReader(request));
-        requestProcessor.process();
         HashMap<String, String> requestMap = requestProcessor.getRequest();
 
         assertEquals(requestMap.get("URI"), "/location");
@@ -48,7 +46,6 @@ public class RequestProcessorTest extends TestCase
     {
         String request = "GET / HTTP/1.1\nHost: watbro\nConnection: keep-alive\nUser-Agent: fake-agent\nContent-Length: 8\r\n\r\nsup bro?";
         RequestProcessor requestProcessor = new RequestProcessor(mockReader(request));
-        requestProcessor.process();
         HashMap<String, String> requestMap = requestProcessor.getRequest();
 
         assertEquals(requestMap.get("Body"), "sup bro?");

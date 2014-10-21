@@ -2,7 +2,7 @@ package com.jayden.server;
 
 import java.util.HashMap;
 
-public class OptionsResponse implements Response
+public class OptionsResponse implements ResponseWithHeader
 {
     public byte[] getResponse(HashMap<String, String> request)
     {

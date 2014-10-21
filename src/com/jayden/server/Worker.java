@@ -20,9 +20,13 @@ public class Worker implements Runnable
         try
         {
             RequestProcessor requestProcessor = new RequestProcessor(getInputStream());
-            requestProcessor.process();
             HashMap<String, String> request = requestProcessor.getRequest();
 
+            Response authResponse = routes.get("/logs");
+            String logDirectory = ((AuthResponse) authResponse).getLogDirectory();
+
+            String requestLine = requestProcessor.getRequestString();
+            logRequest(logDirectory, requestLine);
             byte[] response = new ResponseBuilder(request, this.routes).getResponse();
             getOutputStream().write(response);
             clientSocket.close();
@@ -31,6 +35,12 @@ public class Worker implements Runnable
         {
             e.printStackTrace();
         }
+    }
+
+    public void logRequest(String logDirectory, String requestLine) throws IOException
+    {
+        RequestLogger logger = new RequestLogger(logDirectory);
+        logger.logRequest(requestLine);
     }
 
     public InputStream getInputStream() throws IOException

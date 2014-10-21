@@ -24,15 +24,10 @@ public class RequestProcessor
 
     public HashMap<String, String> getRequest()
     {
-        processedRequest = new HashMap<String, String>();
-
-        processedRequest.put("Method", requestMethod);
-        processedRequest.put("URI", requestURI);
-        processedRequest.put("Parameters", requestParameters);
-        processedRequest.put("Protocol", requestProtocol);
-
         try
         {
+            String requestLine = processFirstLineOfRequest();
+            initializeRequestMap();
             splitRequestHeader();
 
             if (processedRequest.containsKey("Content-Length"))
@@ -42,7 +37,7 @@ public class RequestProcessor
             }
 
             processedRequest.put("Body", requestBody);
-            printRequestToConsole();
+            printRequestToConsole(requestLine);
         }
         catch (IOException e)
         {
@@ -52,8 +47,60 @@ public class RequestProcessor
         return processedRequest;
     }
 
-    private void printRequestToConsole()
+    private void initializeRequestMap()
     {
+        processedRequest = new HashMap<String, String>();
+
+        processedRequest.put("Method", requestMethod);
+        processedRequest.put("URI", requestURI);
+        processedRequest.put("Parameters", requestParameters);
+        processedRequest.put("Protocol", requestProtocol);
+    }
+
+    public String processFirstLineOfRequest() throws IOException
+    {
+        String requestLine = "";
+        try {
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+            bufferedReader = new BufferedReader(inputStreamReader);
+
+            while (!bufferedReader.ready())
+                Thread.sleep(100);
+
+            requestLine = bufferedReader.readLine();
+            splitRequestLine(requestLine);
+            splitParameterFromURI();
+        }
+        catch (InterruptedException e)
+        {
+        }
+
+        return requestLine;
+    }
+
+    public void splitRequestLine(String requestLine)
+    {
+        String[] requestArray = requestLine.split(SP);
+        requestMethod = requestArray[0];
+        requestURI = requestArray[1];
+        requestProtocol = requestArray[2];
+    }
+
+    public void splitParameterFromURI()
+    {
+        if (requestURI.contains("?"))
+        {
+            String URI = requestURI.split("\\?")[0];
+            requestParameters = requestURI.split("\\?")[1];
+            requestURI = URI;
+        }
+    }
+
+    private void printRequestToConsole(String requestLine)
+    {
+        System.out.println("#####INCOMING REQUEST#####");
+        System.out.println(requestLine);
+
         for (Map.Entry<String, String> entry : processedRequest.entrySet())
             System.out.println(entry.getKey() + ": " + entry.getValue());
 
@@ -87,46 +134,6 @@ public class RequestProcessor
         return postContent.toString();
     }
 
-    public void process() throws IOException
-    {
-        try {
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-            bufferedReader = new BufferedReader(inputStreamReader);
-
-            while (!bufferedReader.ready())
-                Thread.sleep(100);
-
-            String requestLine = bufferedReader.readLine();
-
-            System.out.println("#####INCOMING REQUEST#####");
-            System.out.println(requestLine);
-
-            splitRequestLine(requestLine);
-            splitParameterFromURI();
-        }
-        catch (InterruptedException e)
-        {
-        }
-    }
-
-    public void splitRequestLine(String requestLine)
-    {
-        String[] requestArray = requestLine.split(SP);
-        requestMethod = requestArray[0];
-        requestURI = requestArray[1];
-        requestProtocol = requestArray[2];
-    }
-
-    public void splitParameterFromURI()
-    {
-        if (requestURI.contains("?"))
-        {
-            String URI = requestURI.split("\\?")[0];
-            requestParameters = requestURI.split("\\?")[1];
-            requestURI = URI;
-        }
-    }
-
     public String getRequestMethod()
     {
         return requestMethod;
@@ -140,5 +147,10 @@ public class RequestProcessor
     public String getRequestProtocol()
     {
         return requestProtocol;
+    }
+
+    public String getRequestString()
+    {
+        return requestMethod + SP + requestURI + SP + requestProtocol;
     }
 }

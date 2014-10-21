@@ -1,7 +1,6 @@
 package com.jayden.server;
 
 import junit.framework.*;
-
 import java.io.*;
 import java.net.Socket;
 import java.util.*;
@@ -21,6 +20,7 @@ public class WorkerTest extends TestCase
     static
     {
         routeMap = new HashMap<String, Response>();
+        routeMap.put("/logs", new AuthResponse(System.getProperty("user.dir") + "/public"));
         routeMap.put("/wat", new Response() {
             public byte[] getResponse(HashMap<String, String> request) {
                 return "wat bro".getBytes();

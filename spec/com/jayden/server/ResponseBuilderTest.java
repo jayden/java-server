@@ -11,9 +11,7 @@ public class ResponseBuilderTest extends TestCase
     private ByteArrayOutputStream output = null;
     private ResponseBuilder responseBuilder;
     private final String CRLF = "\r\n";
-    private final String BAD_RESPONSE = "HTTP/1.1 404 Not Found\r\n";
     private final String OK_RESPONSE = "HTTP/1.1 200 OK\r\n";
-    private final String DEFAULT_HEADER = "Content-Length: 0\r\nContent-Type: text/plain\r\nServer: Jayden";
 
     private static final HashMap<String, String> requestMap;
     static
@@ -64,21 +62,13 @@ public class ResponseBuilderTest extends TestCase
     public void testSetResponseHeader()
     {
         responseBuilder.setHeader("Server", "Jayden");
-        assertEquals("Server: Jayden" + CRLF, responseBuilder.getHeader());
+        assertTrue(responseBuilder.getHeader().contains("Server: Jayden"));
     }
 
     public void testSetResponseContent()
     {
         responseBuilder.setContent("watbro".getBytes());
         assertEquals("watbro", new String(responseBuilder.getContent()));
-    }
-
-
-    public void testWriteDefaultHeader() throws IOException
-    {
-        responseBuilder.setDefaultHeader();
-        mockWriter().write(responseBuilder.getResponse());
-        assertTrue(output.toString().contains(DEFAULT_HEADER));
     }
 
     public void testFileDirectoryResponse() throws IOException
@@ -92,17 +82,24 @@ public class ResponseBuilderTest extends TestCase
 
     public void test404WriteResponse() throws IOException
     {
-        HashMap<String, String> badResponseMap = requestMap;
+        String badResponse = "HTTP/1.1 404 Not Found\r\n";
+        HashMap<String, String> badResponseMap = new HashMap<String, String>();
+        badResponseMap.put("Method", "GET");
         badResponseMap.put("URI", "/wat");
+        badResponseMap.put("Protocol", "HTTP/1.1");
+
         ResponseBuilder badResponseBuilder = new ResponseBuilder(badResponseMap, routeMap);
         mockWriter().write(badResponseBuilder.getResponse());
-        assertTrue(output.toString().contains(BAD_RESPONSE));
+        assertTrue(output.toString().contains(badResponse));
     }
 
     public void testTimeResponse() throws IOException
     {
-        HashMap<String, String> timeResponseMap = requestMap;
+        HashMap<String, String> timeResponseMap = new HashMap<String, String>();
+        timeResponseMap.put("Method", "GET");
         timeResponseMap.put("URI", "/echo");
+        timeResponseMap.put("Protocol", "HTTP/1.1");
+
         ResponseBuilder timeResponseBuilder = new ResponseBuilder(timeResponseMap, routeMap);
 
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");

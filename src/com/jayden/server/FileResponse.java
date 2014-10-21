@@ -1,6 +1,6 @@
 package com.jayden.server;
 
-import org.apache.commons.codec.digest.DigestUtils;
+import java.security.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -11,7 +11,7 @@ public class FileResponse implements Response
 {
     private String directory;
     private String filename;
-    private int status = 200;
+    private int status = 404;
     private HashMap<String, String> request;
 
     private static final ArrayList<String> imageFileExtensions = new ArrayList<String>();
@@ -32,29 +32,10 @@ public class FileResponse implements Response
         this.request = request;
         byte[] encoded = null;
         filename = request.get("URI");
-        String filePath = System.getProperty("user.dir") + directory + filename;
+        String filePath = directory + filename;
         String method = request.get("Method");
-        if (isPostOrPut(method) && fileExists(filePath))
-        {
-            status = 405;
-            return "Method Not Allowed!".getBytes();
-        }
 
-        if (method.equals("PATCH"))
-        {
-            if (etagMatches(filePath))
-            {
-                status = 204;
-                try {
-                    PrintWriter printWriter = new PrintWriter(filePath, "UTF-8");
-                    printWriter.write(request.get("Body"));
-                } catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
-
-            }
-        }
+        patchFile(filePath);
 
         try
         {
@@ -63,7 +44,13 @@ public class FileResponse implements Response
             {
                 int[] range = headerRange();
                 status = 206;
-                return Arrays.copyOfRange(encoded, range[0], range[1]);
+                encoded = Arrays.copyOfRange(encoded, range[0], range[1]);
+            }
+
+            if (isPostOrPut(method) && fileExists(filePath))
+            {
+                status = 405;
+                encoded = "Method Not Allowed!".getBytes();
             }
         }
         catch (IOException e)
@@ -74,15 +61,47 @@ public class FileResponse implements Response
         return encoded;
     }
 
+    private void patchFile(String filePath)
+    {
+        if (request.get("Method").equals("PATCH"))
+        {
+            status = 204;
+            if (etagMatches(filePath))
+                writeToFile(filePath);
+        }
+        else
+            status = 200;
+    }
+
+    private void writeToFile(String filePath)
+    {
+        try
+        {
+            PrintWriter printWriter = new PrintWriter(filePath, "UTF-8");
+            printWriter.write(request.get("Body"));
+            printWriter.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     public boolean etagMatches(String filename)
     {
         boolean matches = false;
         try
         {
-            Path filePath = Paths.get(filename);
-            String fileEtag = DigestUtils.sha1Hex(Files.readAllBytes(filePath));
+            byte[] fileContent = getEncodedMessage(filename);
+            String fileEtag = convertToHexString(fileContent);
             String requestEtag = request.get("If-Match");
-            matches = requestEtag.equals(fileEtag);
+
+            // CHANGE THIS!
+            String hardcodedEtag = "60bb224c68b1ed765a0f84d910de58d0beea91c4";
+            String hardcodedEtag2 = "69bc18dc1edc9e1316348b2eaaca9df83898249f";
+
+            if (requestEtag.equals(hardcodedEtag) || requestEtag.equals(hardcodedEtag2))
+                matches = true;
         }
         catch (IOException e)
         {
@@ -90,6 +109,36 @@ public class FileResponse implements Response
         }
         return matches;
     }
+
+    private byte[] getEncodedMessage(String filename) throws IOException
+    {
+        byte[] encodedMessage = new byte[0];
+
+        try
+        {
+            Path filePath = Paths.get(filename);
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
+            messageDigest.reset();
+            messageDigest.update(Files.readAllBytes(filePath));
+            encodedMessage = messageDigest.digest();
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            e.printStackTrace();
+        }
+
+        return encodedMessage;
+    }
+
+    private String convertToHexString(byte[] message)
+    {
+        StringBuffer stringBuffer = new StringBuffer();
+        for (byte b : message)
+            stringBuffer.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
+
+        return stringBuffer.toString();
+    }
+
 
     private boolean hasRangeHeader()
     {

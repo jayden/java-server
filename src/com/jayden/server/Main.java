@@ -8,7 +8,7 @@ public class Main
     private static final String PORT_FLAG = "-p";
     private static final String DIRECTORY_FLAG = "-d";
     private static int port = 5000;
-    private static String directory = "/public";
+    private static String directory = System.getProperty("user.dir") + "/public";
     private static Server server;
     private static ArrayList<String> fileList;
 
@@ -39,10 +39,15 @@ public class Main
     private static ArrayList<String> getDirectoryContents()
     {
         ArrayList<String> fileList = new ArrayList<String>();
-        File[] files = new File(System.getProperty("user.dir") + directory).listFiles();
-        for (File file : files)
+        try {
+            File[] files = new File(directory).listFiles();
+            for (File file : files) {
+                fileList.add("/" + file.getName());
+            }
+        }
+        catch (NullPointerException e)
         {
-            fileList.add("/" + file.getName());
+            e.printStackTrace();
         }
         return fileList;
     }

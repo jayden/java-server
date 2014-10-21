@@ -17,7 +17,6 @@ public class ResponseBuilder {
     private HashMap<String, String> headers = new HashMap<String, String>();
     private HashMap<String, String> request;
     private HashMap<String, Response> routes;
-
     static
     {
         statusCodes.put(200, "OK");
@@ -44,16 +43,19 @@ public class ResponseBuilder {
             setStatus(response.getStatus());
             setContentType(response);
 
-            if (response instanceof RedirectResponse)
-                setHeader(((RedirectResponse) response).getHeader(), ((RedirectResponse) response).getHeaderValue());
-            if (response instanceof OptionsResponse)
-                setHeader(((OptionsResponse) response).getHeader(), ((OptionsResponse) response).getHeaderValue());
+            if (response instanceof ResponseWithHeader)
+                setHeader(((ResponseWithHeader) response).getHeader(), ((ResponseWithHeader) response).getHeaderValue());
         }
         else
         {
             setContent("Error: This page doesn't exist!".getBytes());
         }
 
+        return getOutputStreamArray();
+    }
+
+    private byte[] getOutputStreamArray()
+    {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try
         {
@@ -99,8 +101,7 @@ public class ResponseBuilder {
 
     public String getHeader()
     {
-        if (headers.size() == 0)
-            setDefaultHeader();
+        setDefaultHeader();
 
         String header = "";
         for (String field : headers.keySet())

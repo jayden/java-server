@@ -2,7 +2,7 @@ package com.jayden.server;
 
 import java.util.HashMap;
 
-public class RedirectResponse implements Response
+public class RedirectResponse implements ResponseWithHeader
 {
     public byte[] getResponse(HashMap<String, String> request)
     {

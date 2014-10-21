@@ -58,7 +58,7 @@ public class AuthResponseTest extends TestCase
 
 
         byte[] authorizedResponse = response.getResponse(authorizedRequest);
-        assertEquals("test logs", new String(authorizedResponse));
+        assertTrue(new String(authorizedResponse).contains("GET /wat HTTP/1.1"));
         assertEquals(response.getStatus(), 200);
     }
 }
