@@ -6,18 +6,6 @@ A web server written in Java.
 Usage
 -----
 
-To run the server, use the terminal to point to the directory of where the JAR file is located.
+To run the server, use the terminal to point to the directory of where the JAR file is located. Default port is 5000
 
 	java -jar java-server.jar
-
-The server runs locally on port 8000. As of now, there are only two routes:
-
-	http://localhost:8000/
-
-Prints the contents of the directory where the JAR file is running.
-
-	http://localhost:8000/echo
-
-Prints "Hello world: HH:mm:ss" in four seconds. 
-
-All responses to other routes will be greeted with the message, "Error: This page doesn't exist!".
